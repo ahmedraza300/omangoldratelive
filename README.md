@@ -12,12 +12,13 @@ header h1 { margin:0; font-size:1.6rem; color:var(--gold); }
 header button { margin:0 6px; padding:6px 12px; border:none; border-radius:4px; cursor:pointer; }
 main { max-width:900px; margin:20px auto; padding:0 12px; }
 .card { background:#fff; border-radius:8px; box-shadow:0 2px 8px rgba(0,0,0,0.08); margin-bottom:16px; overflow:hidden; }
-.card h2 { margin:0; padding:14px; background:var(--gold); color:#000; font-size:1.1rem; }
-table { width:100%; border-collapse:collapse; }
-th, td { padding:12px; border-bottom:1px solid #eee; text-align:center; }
+.card h2 { margin:0; padding:14px; background:var(--gold); color:#000; font-size:1.1rem; text-align:center; }
+table { width:100%; border-collapse:collapse; text-align:center; }
+th, td { padding:12px; border-bottom:1px solid #eee; }
 th { background:#fafafa; font-weight:bold; }
 .updated { padding:10px; font-size:0.85rem; text-align:right; color:#555; }
 footer { background:#111; color:#ccc; text-align:center; padding:14px; font-size:0.85rem; }
+@media(max-width:600px){header h1{font-size:1.3rem;} table, th, td{font-size:0.85rem;}}
 </style>
 </head>
 <body>
@@ -33,7 +34,11 @@ footer { background:#111; color:#ccc; text-align:center; padding:14px; font-size
 <h2 id="ratesTitle">Today's Gold Rates</h2>
 <table>
 <thead>
-<tr><th id="purityHeader">Gold Purity</th><th id="buyHeader">Buy Price (OMR/g)</th><th id="sellHeader">Sell Price (OMR/g)</th></tr>
+<tr>
+<th id="purityHeader">Gold Purity</th>
+<th id="buyHeader">Buy Price (OMR/g)</th>
+<th id="sellHeader">Sell Price (OMR/g)</th>
+</tr>
 </thead>
 <tbody id="ratesBody">
 <tr><td>24K</td><td>--</td><td>--</td></tr>
@@ -67,29 +72,39 @@ loadRates();
 
 async function loadRates(){
 try{
-const apiKey = 'a09fa9c3db43507a67d991ea9c39c871';
+const apiKey = 'a09fa9c3db43507a67d991ea9c39c871'; // your Metal API key
 const res = await fetch(`https://api.metalpriceapi.com/v1/latest?base=USD&symbols=XAU&api_key=${apiKey}`);
 const data = await res.json();
-const usdPricePerOz = data.rates.XAU; // price per ounce USD
-const usdToOmanRial = 0.385; // 1 USD ≈ 0.385 OMR
-const gramPrice = usdPricePerOz/31.1035*usdToOmanRial;
+if(!data.rates || !data.rates.XAU) return;
+
+// Convert USD/oz → OMR/gram
+const usdPricePerOz = data.rates.XAU;
+const usdToOmanRial = 0.385; 
+const gramPrice = usdPricePerOz / 31.1035 * usdToOmanRial;
+
+// Calculate per carat & buy/sell
 const rates = [
 {karat:24,mult:1},
 {karat:22,mult:22/24},
 {karat:21,mult:21/24},
-{karat:18,mult:18/24},
+{karat:18,mult:18/24}
 ];
+
 rates.forEach((r,i)=>{
-document.getElementById('ratesBody').rows[i].cells[1].textContent = (gramPrice*r.mult).toFixed(3);
-document.getElementById('ratesBody').rows[i].cells[2].textContent = ((gramPrice*r.mult)*1.02).toFixed(3); // +2% markup for sell
+const buy = (gramPrice*r.mult).toFixed(3);
+const sell = (gramPrice*r.mult*1.02).toFixed(3); // 2% markup
+document.getElementById('ratesBody').rows[i].cells[1].textContent = buy;
+document.getElementById('ratesBody').rows[i].cells[2].textContent = sell;
 });
+
 document.getElementById('lastUpdated').textContent = (document.documentElement.lang==='ar'?translations.ar.updatedText:translations.en.updatedText)+' '+new Date().toLocaleString();
-}catch(e){console.error(e);}
+}catch(e){console.error("Error fetching gold rates:", e);}
 }
 
+// Initialize
 setLang('en');
 loadRates();
-setInterval(loadRates,900000);
+setInterval(loadRates,900000); // every 15 minutes
 document.getElementById('year').textContent = new Date().getFullYear();
 </script>
 
