@@ -1,4 +1,4 @@
-<!Raza>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -11,54 +11,59 @@
   --light:#f7f7f7;
   --card:#fff;
   --text:#222;
+  --header-font:'Arial', sans-serif;
+  --body-font:'Arial', sans-serif;
 }
 body {
   margin:0;
-  font-family: Arial,sans-serif;
+  font-family: var(--body-font);
   background: var(--light);
   color: var(--text);
 }
 header {
   background: var(--dark);
-  color: #fff;
-  padding: 16px;
+  color:#fff;
+  padding:16px;
   text-align:center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
 header h1 {
   margin:0;
-  font-size:1.6rem;
+  font-size:1.7rem;
   color: var(--gold);
+  font-weight:bold;
 }
 header button {
-  margin:0 5px;
+  margin:0 6px;
   padding:6px 12px;
   border:none;
   border-radius:4px;
   cursor:pointer;
   background:#222;
   color:#fff;
+  font-weight:bold;
 }
 main {
-  max-width:900px;
-  margin:20px auto;
-  padding:0 12px;
+  max-width: 960px;
+  margin: 20px auto;
+  padding: 0 12px;
 }
 .card {
   background: var(--card);
-  border-radius:10px;
-  box-shadow:0 4px 12px rgba(0,0,0,0.12);
-  padding:12px;
+  border-radius:12px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.18);
   overflow:hidden;
-  margin-bottom:20px;
+  margin-bottom:24px;
 }
 .card h2 {
   margin:0;
-  padding:14px;
+  padding:16px;
   background: var(--gold);
   color:#000;
-  font-size:1.2rem;
   text-align:center;
-  border-radius:8px 8px 0 0;
+  font-size:1.25rem;
+  border-radius:12px 12px 0 0;
+  font-weight:bold;
 }
 table {
   width:100%;
@@ -66,7 +71,7 @@ table {
   text-align:center;
 }
 th, td {
-  padding:12px;
+  padding:14px;
   border-bottom:1px solid #eee;
 }
 th {
@@ -74,7 +79,7 @@ th {
   font-weight:bold;
 }
 .updated {
-  padding:10px;
+  padding:10px 14px;
   font-size:0.85rem;
   text-align:right;
   color:#555;
@@ -83,11 +88,12 @@ footer {
   background: var(--dark);
   color:#ccc;
   text-align:center;
-  padding:14px;
+  padding:16px;
   font-size:0.85rem;
+  box-shadow: 0 -2px 8px rgba(0,0,0,0.2);
 }
 @media(max-width:600px){
-  header h1{font-size:1.3rem;}
+  header h1{font-size:1.4rem;}
   header button{padding:4px 8px;font-size:0.85rem;}
   th, td{font-size:0.85rem;}
 }
@@ -146,12 +152,12 @@ function setLang(lang){
 
 async function loadRates(){
   try{
-    // Public proxy fetch for live XAU to OMR price
+    // Free public proxy fetch for live XAU to OMR
     const res = await fetch("https://api.allorigins.win/raw?url=https://www.goldapi.io/api/XAU/OMR");
     const data = await res.json();
     if(!data.price) return;
 
-    const pricePerGram = data.price / 31.1035; // price per gram
+    const pricePerGram = data.price / 31.1035;
 
     const rates = [
       {karat:24,mult:1},
@@ -180,10 +186,9 @@ async function loadRates(){
 // Initialize
 setLang('en');
 loadRates();
-setInterval(loadRates,900000); // every 15 minutes
+setInterval(loadRates,900000); // refresh every 15 minutes
 document.getElementById('year').textContent = new Date().getFullYear();
 </script>
 
 </body>
 </html>
-
