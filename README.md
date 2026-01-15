@@ -13,7 +13,6 @@
     header p { margin:6px 0 0; font-size:0.9rem; opacity:0.9; }
     header button { margin:0 5px; padding:5px 10px; border:none; border-radius:4px; cursor:pointer; }
     main { max-width:900px; margin:20px auto; padding:0 12px; text-align:center; }
-    .widget-container { display:flex; flex-direction:column; gap:20px; }
     footer { background:#111; color:#ccc; text-align:center; padding:14px; font-size:0.85rem; }
     @media(max-width:600px){header h1{font-size:1.3rem;}}
   </style>
@@ -26,9 +25,9 @@
     <button onclick="setLang('ar')">العربية</button>
   </header>
   <main>
-    <div class="widget-container">
-      <iframe src="https://widget.goldpriceone.app/widget.html?currency=OMR&coins=XAU24,XAU22,XAU21" frameborder="0" width="100%" height="350"></iframe>
-    </div>
+    <!-- Official GoldPriceOne Widget Script -->
+    <div id="goldprice-widget" data-coins="XAU24,XAU22,XAU21" data-currency="OMR" data-theme="auto"></div>
+    <script src="https://widget.goldpriceone.app/goldpriceone-widget.js"></script>
   </main>
   <footer>© <span id="year"></span> Oman Gold Rate Live</footer>
   <script>
