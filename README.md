@@ -68,6 +68,7 @@ th, td{font-size:0.85rem;}
 <footer>© <span id="year"></span> Oman Gold Rate Live</footer>
 
 <script>
+// Translations
 const translations = {
 en:{title:"Oman Gold Rate Live", widgetTitle:"Live Gold Prices", purityHeader:"Gold Purity", buyHeader:"Buy Price (OMR/g)", sellHeader:"Sell Price (OMR/g)", lastUpdated:"Last Updated"},
 ar:{title:"سعر الذهب اليوم في عمان", widgetTitle:"أسعار الذهب اليوم", purityHeader:"عيار الذهب", buyHeader:"سعر الشراء (ر.ع/جرام)", sellHeader:"سعر البيع (ر.ع/جرام)", lastUpdated:"آخر تحديث"}
@@ -84,7 +85,7 @@ function setLang(lang){
   updateLastUpdated();
 }
 
-// Update last updated time every minute
+// Last updated counter
 function updateLastUpdated(){
   const updatedTime = new Date(localStorage.getItem('lastUpdated') || Date.now());
   function tick(){
@@ -95,20 +96,20 @@ function updateLastUpdated(){
   setInterval(tick,60000);
 }
 
-// Function to fetch live prices from Metal API using your key via free proxy
+// Fetch live gold prices from Gold-API
 async function fetchLivePrices(){
   try{
-    const apiKey = "a09fa9c3db43507a67d991ea9c39c871"; // your key
-    const proxy = "https://api.allorigins.win/get?url=";
-    const url = encodeURIComponent("https://metalpriceapi.com/api/XAU/OMR?api_key="+apiKey);
-    const res = await fetch(proxy+url);
-    const text = await res.json();
-    const data = JSON.parse(text.contents);
-
-    const price24 = parseFloat(data['XAU']['OMR']['24K']);
-    const price22 = parseFloat(data['XAU']['OMR']['22K']);
-    const price21 = parseFloat(data['XAU']['OMR']['21K']);
-    const price18 = parseFloat(data['XAU']['OMR']['18K']);
+    const apiKey = "624c17a7eb389117bf9307aca42241b7c8e98ed87fd0badedc8ab9cab4c50275"; // your Gold-API key
+    const res = await fetch(`https://www.goldapi.io/api/XAU/OMR`,{
+      headers: { "x-access-token": apiKey, "Content-Type":"application/json" }
+    });
+    const data = await res.json();
+    // Convert from ounce to gram (1 troy ounce = 31.1035 grams)
+    const ounceToGram = (o)=> o/31.1035;
+    const price24 = ounceToGram(data.price24k); 
+    const price22 = ounceToGram(data.price22k); 
+    const price21 = ounceToGram(data.price21k); 
+    const price18 = ounceToGram(data.price18k); 
 
     const sell = (p)=> (p*1.02).toFixed(2);
 
@@ -131,14 +132,12 @@ async function fetchLivePrices(){
   }
 }
 
+// Run on load + auto refresh every 15 mins
 fetchLivePrices();
-setLang('en');
-document.getElementById('year').textContent = new Date().getFullYear();
-
-// Auto refresh every 15 minutes
 setInterval(fetchLivePrices,15*60*1000);
 
+setLang('en');
+document.getElementById('year').textContent = new Date().getFullYear();
 </script>
 </body>
 </html>
-
